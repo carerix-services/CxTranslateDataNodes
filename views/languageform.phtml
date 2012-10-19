@@ -1,0 +1,47 @@
+<form method="POST" action="">
+	<table>
+		<tr>
+			<td>Required IP is:</td>
+			<td><?=$_SERVER['SERVER_ADDR']?></td>
+		</tr>
+		<tr>
+			<td>App:</td>
+			<td><?=$this->_app?></td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td>*****</td>
+		</tr>
+		<tr>
+			<td>From language:</td>
+			<td>
+				<select name="sourcelanguage"><?php
+foreach ( $languages as $lang ) {
+	$selected = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
+	echo "<option value='{$lang}'{$selected}>{$lang}</option>\n";
+}
+?>
+				</input>
+			</td>
+		</tr>
+		<tr>
+			<td rowspan="<?=count($languages)?>">To languages:</td>
+<?php $lang = $languages[0]; 
+	$checked = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
+?>
+			<td><label><input type="checkbox" name='filllanguages[]' value="<?=$languages[0]?>"<?=$checked?>><?=$languages[0]?></label></td>
+		</tr>
+<?php
+for ( $it = 1; $it < count($languages); $it++ ) {
+	$lang = $languages[$it]; 
+	$checked = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
+	echo "<tr><td><label><input type='checkbox' name='filllanguages[]' value='{$lang}'{$checked}>{$lang}</label></td></tr>\n";
+}
+?>		
+		<tr>
+			<td><input name="password" value="Terug" type="submit"/></td>
+			<td><input type="reset"/><input type="submit"/></td>
+		</tr>
+		
+	</table>
+</form>

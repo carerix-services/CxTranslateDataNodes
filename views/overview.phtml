@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Translate!</title>
+<style>
+td {
+	vertical-align: top;
+}
+</style>
+</head>
+<body>
+<?php
+	foreach ( ExceptionController::getAll() as $exception ) {
+		echo '<div class="error">' . $exception->getMessage() . '</div>';
+	} // foreach
+	ViewController::showView();
+?>
+</body>
+</html>

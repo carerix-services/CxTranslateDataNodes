@@ -1,0 +1,20 @@
+<form method="POST" action="">
+	<table>
+		<tr>
+			<td>Required IP is:</td>
+			<td><?=$_SERVER['SERVER_ADDR']?></td>
+		</tr>
+		<tr>
+			<td>App:</td>
+			<td><input type="text" name="app" value="<?=$this->_app?>"/></td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td><input type="password" name="password" value="<?=$this->_password?>"/></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type="reset"/><input type="submit"/></td>
+		</tr>
+	</table>
+</form>
