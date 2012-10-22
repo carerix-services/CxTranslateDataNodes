@@ -7,14 +7,20 @@
 td {
 	vertical-align: top;
 }
+.viewport {
+	width: 790px;
+	margin: auto;
+}
+table {
+	width: 100%;
+}
 </style>
 </head>
 <body>
+<div class="viewport">
 <?php
-	foreach ( ExceptionController::getAll() as $exception ) {
-		echo '<div class="error">' . $exception->getMessage() . '</div>';
-	} // foreach
 	ViewController::showView();
 ?>
+</div>
 </body>
 </html>

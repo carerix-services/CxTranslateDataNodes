@@ -4,11 +4,11 @@ class ExceptionController {
 	
 	public static function addException(Exception $e) {
 		self::$_exceptions []= $e;
+		$exceptions = self::$_exceptions;
+		ob_start();
+		require_once ROOTDIR . '/views/exceptions.phtml';
+		ViewController::setView(ob_get_clean());
 		require_once ROOTDIR . '/views/overview.phtml';
 	} // addException();
-	
-	public static function getAll() {
-		return self::$_exceptions;
-	} // getAll();
 	
 } // ExceptionController();

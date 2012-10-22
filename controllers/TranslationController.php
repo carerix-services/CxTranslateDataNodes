@@ -10,6 +10,12 @@ class TranslationController {
 	 */
 	protected $_pdo = null;
 	
+	/**
+	 * Array of prepared statements for selecting the translations based on the 
+	 * language that is the key of the array
+	 * 
+	 * @var string => string
+	 */
 	protected $_preparedGetFor = array();
 	
 	/**

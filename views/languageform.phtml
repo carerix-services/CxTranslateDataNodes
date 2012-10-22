@@ -15,29 +15,34 @@
 		<tr>
 			<td>From language:</td>
 			<td>
-				<select name="sourcelanguage"><?php
-foreach ( $languages as $lang ) {
-	$selected = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
-	echo "<option value='{$lang}'{$selected}>{$lang}</option>\n";
-}
+				<select name="sourcelanguage">
+<?php
+	foreach ( $languages as $lang ) {
+		$selected = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
+		echo "<option value='{$lang}'{$selected}>{$lang}</option>\n";
+	}
 ?>
-				</input>
+				</select>
 			</td>
 		</tr>
 		<tr>
-			<td rowspan="<?=count($languages)?>">To languages:</td>
-<?php $lang = $languages[0]; 
-	$checked = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
-?>
-			<td><label><input type="checkbox" name='filllanguages[]' value="<?=$languages[0]?>"<?=$checked?>><?=$languages[0]?></label></td>
-		</tr>
+			<td rowspan="<?=(count($languages) + 1)?>">To languages:</td>
 <?php
-for ( $it = 1; $it < count($languages); $it++ ) {
-	$lang = $languages[$it]; 
-	$checked = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
-	echo "<tr><td><label><input type='checkbox' name='filllanguages[]' value='{$lang}'{$checked}>{$lang}</label></td></tr>\n";
-}
+	foreach ( $languages as $datanodeid => $lang ) {
+		$checked = in_array($lang, $this->_filllanguages) ? ' checked="checked"' : '';
+		echo "<td><label><input type='checkbox' name='filllanguages[$datanodeid]' value='{$lang}'{$checked}>{$lang}</label></td></tr>\n<tr>";
+	}
 ?>		
+			<td><b>Missing languages?</b> Check the translation file's header against the system languages available in the App
+		</tr>
+		<tr>
+			<td>Miscellaneous:</td>
+			<td>
+				<input type="hidden" name="overwrite" value="0"/>
+				<input type="checkbox" id="overwrite" name="overwrite" value="1"<?=$this->_overwrite?' checked="checked"':''?>/>
+				<label for="overwrite">Overwrite already existing nodes</label>
+			</td>
+		</tr>
 		<tr>
 			<td><input name="password" value="Terug" type="submit"/></td>
 			<td><input type="reset"/><input type="submit"/></td>

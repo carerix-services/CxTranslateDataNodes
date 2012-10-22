@@ -50,6 +50,11 @@ class DbReport extends SQLiteObject {
 						'description' => "The message generated for this report",
 						'default' => '',
 				),
+				'language' => (object) array(
+						'type' => 'TEXT',
+						'description' => "The language for which the report was generated",
+						'default' => '',
+				),
 		);
 	} // getFields();
 
