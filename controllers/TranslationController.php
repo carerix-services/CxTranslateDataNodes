@@ -130,7 +130,7 @@ class TranslationController {
 		ob_start();
 		require_once ROOTDIR . '/views/upload.phtml';
 		ViewController::setView(ob_get_clean());
-	} // _showTranslationUpload();
+	} // showTranslationUpload();
 	
 	/**
 	 * Removes (actually: renames) the translation table 

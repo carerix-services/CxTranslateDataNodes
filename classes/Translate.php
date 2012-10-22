@@ -82,7 +82,7 @@ class Translate {
 		$this->_tc = new TranslationController();
 		
 		if ( !$this->_tc->init() ) {
-			$this->_tc->showTranslationUpload();
+			$this->showTranslationUpload();
 		} else if ( empty($this->_app) || empty($this->_password) ) {
 			$this->_showAppForm();
 		} else if ( empty($this->_sourcelanguage) || empty($this->_filllanguages) ) {
@@ -92,9 +92,19 @@ class Translate {
 			$this->_showResult();
 			
 			// reset the $_SESSION to reset the form
-// 			$_SESSION = array();
+			$_SESSION = array();
 		}
 	} // run();
+	
+	/**
+	 * Shows the uploads view.
+	 */
+	public function showTranslationUpload() {
+		if ( empty($this->_tc) ) {
+			$this->_tc = new TranslationController();
+		}
+		return $this->_tc->showTranslationUpload();
+	} // showTranslationUpload();
 	
 	/**
 	 * Shows the app form (choose app, choose app password)

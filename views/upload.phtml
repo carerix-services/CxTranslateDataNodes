@@ -1,4 +1,9 @@
-<form enctype="multipart/form-data" action="" method="POST">
-	Please choose a file: <input name="u<?= $_SESSION['secure']; ?>" type="file" /><br />
- 	<input type="submit" value="Upload" />
+<div class="span4 offset4">
+<form enctype="multipart/form-data" action="start" method="POST">
+	<legend>Choose a translation file</legend>
+	<input name="u<?= $_SESSION['secure']; ?>" type="file" /><br />
+	<br />
+ 	<a href="start" class="btn">Back</a>
+ 	<input class="btn btn-danger" type="submit" value="Upload" />
 </form> 
+</div>
