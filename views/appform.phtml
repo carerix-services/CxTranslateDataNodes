@@ -1,20 +1,24 @@
-<form method="POST" action="">
-	<table>
-		<tr>
-			<td>Required IP is:</td>
-			<td><?=$_SERVER['SERVER_ADDR']?></td>
-		</tr>
-		<tr>
-			<td>App:</td>
-			<td><input type="text" name="app" value="<?=$this->_app?>"/></td>
-		</tr>
-		<tr>
-			<td>Password:</td>
-			<td><input type="password" name="password" value="<?=$this->_password?>"/></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><input type="reset"/><input type="submit"/></td>
-		</tr>
-	</table>
-</form>
+<div class="span4 offset4">
+	<form method="POST" action="" class="form-horizontal">
+		<div class="control-group">
+			<legend>App information</legend>
+			<label class="control-label">Required IP</label>
+			<div class="controls"><span class="uneditable-input"><?=$_SERVER['SERVER_ADDR']?></span></div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="app">App name</label>
+			<div class="controls"><input type="text" name="app" id="app" value="<?=$this->_app?>"/></div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="password">Password</label>
+			<div class="controls"><input type="password" name="password" id="password" value="<?=$this->_password?>"/></div>
+		</div>
+		<div class="control-group">
+			<div class="controls">
+				<button type="reset" class="btn">Reset</button>
+				&nbsp;
+				<button type="submit" class="btn btn-primary">Next</button>
+			</div>
+		</div>
+	</form>
+</div>

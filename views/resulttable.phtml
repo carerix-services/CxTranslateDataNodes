@@ -1,3 +1,74 @@
-<?
-print_r($reports);
+<div class="span8 offset2">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Original</th>
+<?php 
+	$prototype = (object) array(
+			'id' => 0,
+			'sourcelanguage' => '',
+			'languages' => array(),
+			'hasError' => false,
+			'original' => '',
+	);
+	
+	foreach ( $this->_filllanguages as $lang ) {
+		echo "<th>{$lang}</th>\n";
+		$prototype->languages[$lang] = '';
+	} // foreach
 ?>
+			</tr>
+		</thead>
+		<tbody>
+<?php
+	foreach ( $reports as $report ) {
+		if ( !empty($aggregate) && $aggregate->id !== $report->datanodeid ) {
+			echo "<tr class='" . ($aggregate->hasError ? 'warning' : 'success') . "'>\n<td>{$aggregate->id}</td>\n";
+			echo "<td>{$aggregate->original}</td>\n";
+			foreach ( $this->_filllanguages as $id => $lang ) {
+				if ( !empty($aggregate->languages[$lang]) ) {
+					echo "<td class='alert-warning'>{$aggregate->languages[$lang]}</td>\n";
+				} else {
+					echo "<td>OK</td>\n";
+				}
+			} // foreach
+			echo "</tr>\n";
+		}
+		
+		if ( empty($report->language) ) {
+			echo "<tr class='error'>\n"
+							. "<td>{$report->datanodeid}</td>\n" 
+							. "<td>{$report->original}</td>\n" 
+							. "<td colspan='" . count($this->_filllanguages) . "' class='error'>{$report->message}</td>\n"
+					. "</tr>\n";
+			unset($aggregate);
+		} else {
+			 // print previous aggregate before beginning new one
+			
+			$aggregate = clone $prototype;
+			$aggregate->id = $report->datanodeid;
+			$aggregate->original = $report->original;
+			$aggregate->languages[$report->language] = $report->message;
+			if ( !$report->success ) {
+				$aggregate->hasError = true;
+			}
+		}
+	} // foreach
+	
+	if ( !empty($aggregate) ) {
+		echo "<tr class='" . ($aggregate->hasError ? 'warning' : 'success') . "'>\n<td>{$aggregate->id}</td>\n";
+		echo "<td>{$aggregate->original}</td>\n";
+		foreach ( $this->_filllanguages as $id => $lang ) {
+			if ( !empty($aggregate->languages[$lang]) ) {
+				echo "<td class='alert-warning'>{$aggregate->languages[$lang]}</td>\n";
+			} else {
+				echo "<td>OK</td>\n";
+			}
+		} // foreach
+		echo "</tr>\n";
+	}
+?>
+		</tbody>
+	</table>
+</div>

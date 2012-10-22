@@ -1,5 +1,7 @@
+<div class="span4 offset4">
 <?php
 	foreach ( $exceptions as $exception ) {
-		echo '<div class="error">' . nl2br($exception->getMessage()) . '</div>';
+		echo '<div class="alert-error">' . nl2br($exception->getMessage()) . '</div>';
 	} // foreach
 ?>
+</div>

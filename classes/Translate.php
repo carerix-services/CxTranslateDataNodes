@@ -53,7 +53,7 @@ class Translate {
 	 */
 	public function __wakeup() {
 		foreach ( $_REQUEST as $key => $val ) {
-			if ( $key === 'password' && $val === 'Terug' ) {
+			if ( $key === 'password' && $val === 'Back' ) {
 				$val = '';
 			}
 			
@@ -92,7 +92,7 @@ class Translate {
 			$this->_showResult();
 			
 			// reset the $_SESSION to reset the form
-			$_SESSION = array();
+// 			$_SESSION = array();
 		}
 	} // run();
 	
@@ -143,7 +143,7 @@ class Translate {
 			);
 			$query = preg_replace('/%5B[0-9]+%5D=/', '=', http_build_query($query));
 			
-			$xml = file_get_contents(
+			$xml = @file_get_contents(
 					"http://{$this->_app}web.carerix.net/cgi-bin/WebObjects/{$this->_app}web.woa/wa/view?" . $query,
 					false,
 					stream_context_create(array(
@@ -186,11 +186,10 @@ class Translate {
 		while ( $this->_dataNodeCount > -1 ) {
 			$xpath = $this->_getAllDataNodes();
 			foreach ( $xpath->query('/*/*') as $node) {
-				if ( !$this->_updateLanguageFor($node, $xpath) ) {
-					break 2;
-				}
-// 				$this->_updateLanguageFor($node, $xpath);
+				$this->_updateLanguageFor($node, $xpath);
+				set_time_limit(1);
 			} // foreach
+			break;
 		} // while
 	} // _translate();
 	
@@ -211,23 +210,27 @@ class Translate {
 			}
 			
 			foreach ( $this->_filllanguages as $datanodeid => $toLang ) {
-				$overwriteID = null;
-				
-				if ( $subnode = $xpath->query("values/CRDataNodeValue[toLanguageNode/*/value='{$toLang}']", $node)->item(0) ) {
-					if ( !$this->_overwrite ) {
-						$this->_report($id, 'Translation already present', $toLang);
-						continue;
-					} else {
-						$overwriteID = $subnode->getAttribute('id');
+				try {
+					$overwriteID = null;
+					
+					if ( $subnode = $xpath->query("values/CRDataNodeValue[toLanguageNode/*/value='{$toLang}']", $node)->item(0) ) {
+						if ( !$this->_overwrite ) {
+							$this->_report($id, 'Translation already present', $original->nodeValue, $toLang);
+							continue;
+						} else {
+							$overwriteID = $subnode->getAttribute('id');
+						}
 					}
+					
+					$this->_updateNode($id, $datanodeid, $translation->$toLang, $overwriteID);
+					$this->_report($id, null, $original->nodeValue, $toLang);
+				} catch ( Exception $e ) {
+					$this->_report($id, $e->getMessage(), $original->nodeValue, $toLang);
 				}
-				
-				$this->_updateNode($id, $datanodeid, $translation->$toLang, $overwriteID);
-				$this->_report($id, null, $toLang);
 			} // foreach
 			
 		} catch ( Exception $e ) {
-			$this->_report($id, $e->getMessage());
+			$this->_report($id, $e->getMessage(), @$original->nodeValue);
 			return false;
 		}
 		
@@ -284,13 +287,14 @@ class Translate {
 	 * @param int $id
 	 * @param string $message
 	 */
-	protected function _report($id, $message = null, $language = null) {
+	protected function _report($id, $message = null, $original = null, $language = null) {
 		$report = new DbReport;
 		$report->app = $this->_app;
 		$report->datanodeid = $id;
 		$report->success = $message === null;
 		$report->message = $message;
 		$report->language = $language;
+		$report->original = $original;
 		$report->store();
 	} // _report();
 	
@@ -299,7 +303,7 @@ class Translate {
 	 */
 	protected function _showResult() {
 		ob_start();
-		$reports = DbReport::getPDO()->prepare('SELECT * FROM DbReport');
+		$reports = DbReport::getPDO()->prepare('SELECT * FROM DbReport ORDER BY datanodeid');
 		$reports->execute();
 		$reports->setFetchMode(PDO::FETCH_CLASS, 'DbReport');
 		require_once ROOTDIR . '/views/resulttable.phtml';
@@ -313,17 +317,19 @@ class Translate {
 	 */
 	protected function _getAllDataNodes($query = null) {
 		// retrieve the requested XML
-		$count = 100;
+		$count = 20;
 		$query = array(
 				"template" => "objects.xml",
 				"entity" => "CRDataNode",
 				"start" => $this->_dataNodeCount,
 				"count" => $count,
+				"ordering" => "({key=dataNodeID;sel=Ascending})",
+// 				"qualifier" => "dataNodeID=16",
 				"show" => array("values.value", 'values.toLanguageNode.value'),
 		);
 		$query = preg_replace('/%5B[0-9]+%5D=/', '=', http_build_query($query));
 		
-		$xml = file_get_contents(
+		$xml = @file_get_contents(
 				"http://{$this->_app}web.carerix.net/cgi-bin/WebObjects/{$this->_app}web.woa/wa/view?" . $query,
 				false,
 				stream_context_create(array(
@@ -336,7 +342,7 @@ class Translate {
 
 		// if this is not an XML: throw exception
 		if ( strpos($xml, '<?xml') !== 0 ) {
-			throw new Exception("Failed to obtain XML for GET view: " . print_r($http_response_header, 1));
+			throw new Exception("Failed to obtain XML for GET view: " . @print_r($http_response_header, 1));
 		}
 	
 		// create and return the DOMXPath

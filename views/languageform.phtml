@@ -1,52 +1,64 @@
-<form method="POST" action="">
-	<table>
-		<tr>
-			<td>Required IP is:</td>
-			<td><?=$_SERVER['SERVER_ADDR']?></td>
-		</tr>
-		<tr>
-			<td>App:</td>
-			<td><?=$this->_app?></td>
-		</tr>
-		<tr>
-			<td>Password:</td>
-			<td>*****</td>
-		</tr>
-		<tr>
-			<td>From language:</td>
-			<td>
-				<select name="sourcelanguage">
-<?php
-	foreach ( $languages as $lang ) {
-		$selected = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
-		echo "<option value='{$lang}'{$selected}>{$lang}</option>\n";
-	}
-?>
+<div class="span4 offset4">
+	<form method="POST" action="" class="form-horizontal">
+		<div class="control-group">
+			<legend>Choose languages</legend>
+			<label class="control-label">Required IP</label>
+			<div class="controls"><span class="uneditable-input"><?=$_SERVER['SERVER_ADDR']?></span></div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="app">App name</label>
+			<div class="controls"><span class="uneditable-input"><?=$this->_app?></span></div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="password">Password</label>
+			<div class="controls"><span class="uneditable-input">*****</span></div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="sourcelanguage">From language</label>
+			<div class="controls">
+				<select name="sourcelanguage" id="sourcelanguage">
+	<?php
+		foreach ( $languages as $lang ) {
+			$selected = $this->_sourcelanguage === $lang ? ' selected="selected"' : '';
+			echo "\t\t\t\t\t<option value='{$lang}'{$selected}>{$lang}</option>\n";
+		}
+	?>
 				</select>
-			</td>
-		</tr>
-		<tr>
-			<td rowspan="<?=(count($languages) + 1)?>">To languages:</td>
-<?php
-	foreach ( $languages as $datanodeid => $lang ) {
-		$checked = in_array($lang, $this->_filllanguages) ? ' checked="checked"' : '';
-		echo "<td><label><input type='checkbox' name='filllanguages[$datanodeid]' value='{$lang}'{$checked}>{$lang}</label></td></tr>\n<tr>";
-	}
-?>		
-			<td><b>Missing languages?</b> Check the translation file's header against the system languages available in the App
-		</tr>
-		<tr>
-			<td>Miscellaneous:</td>
-			<td>
-				<input type="hidden" name="overwrite" value="0"/>
-				<input type="checkbox" id="overwrite" name="overwrite" value="1"<?=$this->_overwrite?' checked="checked"':''?>/>
-				<label for="overwrite">Overwrite already existing nodes</label>
-			</td>
-		</tr>
-		<tr>
-			<td><input name="password" value="Terug" type="submit"/></td>
-			<td><input type="reset"/><input type="submit"/></td>
-		</tr>
-		
-	</table>
-</form>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="sourcelanguage">To languages</label>
+			<div class="controls">
+	<?php
+		foreach ( $languages as $datanodeid => $lang ) {
+			$checked = in_array($lang, $this->_filllanguages) ? ' checked="checked"' : '';
+			echo "\t\t\t\t\t<label class='checkbox' id='{$datanodeid}'><input type='checkbox' id='{$datanodeid}' name='filllanguages[{$datanodeid} ]' value='{$lang}'{$checked}/>{$lang}</label>\n";
+		}
+	?>	
+				<div class="help-block">
+					<b>Missing languages?</b> Check the translation file's header against the system languages available in the App
+				</div>
+			</div>
+	
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="sourcelanguage">Miscellaneous</label>
+			<div class="controls">
+				<label for="overwrite">
+					<input type="hidden" name="overwrite" value="0"/>
+					<input type="checkbox" id="overwrite" name="overwrite" value="1"<?=$this->_overwrite?' checked="checked"':''?>/>
+					Overwrite existing nodes
+				</label>
+			</div>
+		</div>
+		<div class="control-group">
+			<input name="password" value="Back" type="submit" class="control-label btn" style="width: auto;"/>
+			<div class="controls">
+				<button type="reset" class="btn">Reset</button>
+				&nbsp;
+				<button type="submit" class="btn btn-primary">Next</button>
+			</div>
+			
+		</table>
+	</form>
+<div class="span4 offset4">

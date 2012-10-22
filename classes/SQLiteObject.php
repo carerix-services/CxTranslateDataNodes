@@ -117,8 +117,14 @@ abstract class SQLiteObject {
 	 * 
 	 * @return PDO
 	 */
-	public static function getPDO() {
-		return self::$_pdo ? self::$_pdo : DBConnect::getPDO();
+	public static function getPDO($location = '') {
+		if ( self::$_pdo ) {
+			return self::$_pdo;
+		}
+		if ( empty($location) ) {
+			throw new Exception('Please initialise with location');
+		}
+		return self::$_pdo ? self::$_pdo : DBConnect::getPDO($location);
 	} // getPDO
 	
 	/**

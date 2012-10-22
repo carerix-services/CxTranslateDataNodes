@@ -29,13 +29,15 @@ class DBConnect {
 	 * @throws Exception
 	 * @return PDO
 	 */
-	public static function getPDO() {
+	public static function getPDO($location = null) {
 		if ( self::$_instance === null ) {
-			$loc = ROOTDIR . 'db/.db';
-			if ( !touch($loc) ) {
+			if ( $location === null ) {
+				$location = ROOTDIR . 'db/.db';
+			}
+			if ( !touch($location) ) {
 				throw new Exception('Can neither find nor create the db file');
 			}
-			self::$_instance = new PDO('sqlite:' . $loc);
+			self::$_instance = new PDO('sqlite:' . $location);
 		}
 		return self::$_instance;
 	} // __getInstance();

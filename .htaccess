@@ -1,0 +1,46 @@
+<IfModule mod_rewrite.c>
+  Options +FollowSymlinks
+  Options +Indexes
+  RewriteEngine on
+
+  # if your app is in a subfolder
+  # RewriteBase /my_app/
+  
+  # Prevent access to hidden files on the server
+	RewriteRule ^([^/]+/)*\. - [F]
+	
+  # Redirect non-existing css file to /views/css
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)\.css$ views/css/$1.css
+  
+  # Redirect non-existing png file to /views/img
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)\.png$ views/img/$1.png
+  
+  # Redirect non-existing jpg file to /views/img
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)\.(jpe?g)$ views/img/$1.$2
+  
+  # Redirect non-existing png file to /views/img
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)\.gif$ views/img/$1.gif
+  
+  # Redirect non-existing js file to /views/js
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)\.js$ views/js/$1.js
+  
+  # rewrite all other things to index.php
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteRule ^(.*)$   index.php?uri=/$1    [NC,L,QSA]
+
+  # with QSA flag (query string append),
+  # forces the rewrite engine to append a query string part of the
+  # substitution string to the existing string, instead of replacing it.
+</IfModule>
+
