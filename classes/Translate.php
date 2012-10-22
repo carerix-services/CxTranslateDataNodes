@@ -184,10 +184,10 @@ class Translate {
 	 */
 	protected function _translate() {
 		while ( $this->_dataNodeCount > -1 ) {
+			set_time_limit(10);
 			$xpath = $this->_getAllDataNodes();
 			foreach ( $xpath->query('/*/*') as $node) {
 				$this->_updateLanguageFor($node, $xpath);
-				set_time_limit(1);
 			} // foreach
 			break;
 		} // while
@@ -324,7 +324,7 @@ class Translate {
 				"start" => $this->_dataNodeCount,
 				"count" => $count,
 				"ordering" => "({key=dataNodeID;sel=Ascending})",
-// 				"qualifier" => "dataNodeID=16",
+				"qualifier" => "notActive=0",
 				"show" => array("values.value", 'values.toLanguageNode.value'),
 		);
 		$query = preg_replace('/%5B[0-9]+%5D=/', '=', http_build_query($query));
@@ -340,6 +340,8 @@ class Translate {
 				))
 		);
 
+// 		die($xml);
+		
 		// if this is not an XML: throw exception
 		if ( strpos($xml, '<?xml') !== 0 ) {
 			throw new Exception("Failed to obtain XML for GET view: " . @print_r($http_response_header, 1));
