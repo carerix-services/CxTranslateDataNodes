@@ -7,7 +7,14 @@
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="app">App name</label>
-			<div class="controls"><span class="uneditable-input"><?=$this->_app?></span></div>
+			<div class="controls">
+				<div class="input-prepend input-append">
+					<span class="add-on">http://</span>
+					<span class="uneditable-input" style="width: 75px"><?=$this->_app?></span>
+					<span class="add-on">.carerix.net/</span>
+				</div>
+			</div>
+			
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="password">Password</label>
@@ -35,20 +42,15 @@
 			echo "\t\t\t\t\t<label class='checkbox' id='{$datanodeid}'><input type='checkbox' id='{$datanodeid}' name='filllanguages[{$datanodeid} ]' value='{$lang}'{$checked}/>{$lang}</label>\n";
 		}
 	?>	
-				<div class="help-block alert alert-info">
-					<h4>Missing languages?</h4>
-					Check the translation file's header against the system languages available in the App
-				</div>
 			</div>
-	
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="sourcelanguage">Miscellaneous</label>
 			<div class="controls">
-				<label for="overwrite">
-					<input type="hidden" name="overwrite" value="0"/>
+				<input type="hidden" name="overwrite" value="0"/>
+				<label for="overwrite" class="checkbox">
 					<input type="checkbox" id="overwrite" name="overwrite" value="1"<?=$this->_overwrite?' checked="checked"':''?>/>
-					Overwrite existing nodes
+					Overwrite existing translations
 				</label>
 			</div>
 		</div>
@@ -59,7 +61,10 @@
 				&nbsp;
 				<button type="submit" class="btn btn-primary">Next</button>
 			</div>
-			
-		</table>
+		</div>
+			<div class="alert alert-info">
+			<h4>Missing languages?</h4>
+			Check the translation file's header against the system languages available in the App
+		</div>
 	</form>
 <div class="span4 offset4">

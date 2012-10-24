@@ -7,10 +7,16 @@
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="app">App name</label>
-			<div class="controls"><input type="text" name="app" id="app" value="<?=$this->_app?>"/></div>
+			<div class="controls">
+				<div class="input-prepend input-append">
+					<span class="add-on">http://</span>		
+					<input type="text" style="width: 75px" name="app" id="app" value="<?=$this->_app?>" autofocus="autofocus" placeholder="&lt;appname&gt;"/>
+					<span class="add-on">.carerix.net/</span>
+				</div>
+			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="password">Password</label>
+			<label class="control-label" for="password">XML Password</label>
 			<div class="controls"><input type="password" name="password" id="password" value="<?=$this->_password?>"/></div>
 		</div>
 		<div class="control-group">
