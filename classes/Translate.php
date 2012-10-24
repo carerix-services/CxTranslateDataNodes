@@ -199,7 +199,6 @@ class Translate {
 			foreach ( $xpath->query('/*/*') as $node) {
 				$this->_updateLanguageFor($node, $xpath);
 			} // foreach
-			break;
 		} // while
 	} // _translate();
 	
@@ -350,8 +349,6 @@ class Translate {
 				))
 		);
 
-// 		die($xml);
-		
 		// if this is not an XML: throw exception
 		if ( strpos($xml, '<?xml') !== 0 ) {
 			throw new Exception("Failed to obtain XML for GET view: " . @print_r($http_response_header, 1));
