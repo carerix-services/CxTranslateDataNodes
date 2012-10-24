@@ -1,7 +1,14 @@
 <div class="span4 offset4">
 <?php
 	foreach ( $exceptions as $exception ) {
-		echo '<div class="alert alert-error">' . nl2br($exception->getMessage()) . '</div>';
+		echo nl2br(
+				'<div class="alert alert-error">Exception in '
+					. basename($exception->getFile()) 
+					. ' (line ' . $exception->getLine() . ')'
+					. PHP_EOL . PHP_EOL 
+					. $exception->getMessage() 
+				. '</div>');
 	} // foreach
 ?>
+<a href="." class="btn btn-primary">Start over</a>
 </div>

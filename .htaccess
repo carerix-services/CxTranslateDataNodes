@@ -1,10 +1,12 @@
+AddDefaultCharset utf-8
+
 <IfModule mod_rewrite.c>
   Options +FollowSymlinks
   Options +Indexes
   RewriteEngine on
 
   # if your app is in a subfolder
-  # RewriteBase /my_app/
+  # RewriteBase /CxTranslateDataNodes/
   
   # Prevent access to hidden files on the server
 	RewriteRule ^([^/]+/)*\. - [F]

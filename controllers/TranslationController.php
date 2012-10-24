@@ -76,7 +76,9 @@ class TranslationController {
 		touch($this->_dbLocation);
 		$this->_getPDO();
 		
-		$cols = fgetcsv($fp, 0, ';', '"', '"');
+		if ( !($cols = fgetcsv($fp, 0, ';', '"')) ) {
+			throw new Exception('No valid columns found in file');
+		}
 		
 		$sql = "CREATE TABLE translations (`" . implode('`, `', $cols) . "`);";
 		$this->_pdo->exec($sql);
@@ -84,13 +86,14 @@ class TranslationController {
 		$sql = "INSERT INTO translations (`" . implode('`, `', $cols) . "`) VALUES (:" . implode(', :', $cols) . ")";
 		$stmt = $this->_pdo->prepare($sql);
 		
-		while ( ($line = fgetcsv($fp, 0, ';', '"', '"')) !== FALSE ) {
+		while ( ($line = fgetcsv($fp, 0, ';', '"')) !== FALSE ) {
 			$fields = array();
 			foreach ( $line as $id => $val ) {
 				$stmt->bindValue($cols[$id], $val);
 			} // foreach
 			$stmt->execute();
 		} // while
+
 	} // createNewTranslations();
 
 	/**
