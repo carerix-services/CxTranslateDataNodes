@@ -326,14 +326,14 @@ class Translate {
 	 */
 	protected function _getAllDataNodes($query = null) {
 		// retrieve the requested XML
-		$count = 20;
+		$count = 100;
 		$query = array(
 				"template" => "objects.xml",
 				"entity" => "CRDataNode",
 				"start" => $this->_dataNodeCount,
 				"count" => $count,
 				"ordering" => "({key=dataNodeID;sel=Ascending})",
-				"qualifier" => "notActive=0",
+				"qualifier" => "notActive=0 and type.isMultiLanguage=1",
 				"show" => array("values.value", 'values.toLanguageNode.value'),
 		);
 		$query = preg_replace('/%5B[0-9]+%5D=/', '=', http_build_query($query));
