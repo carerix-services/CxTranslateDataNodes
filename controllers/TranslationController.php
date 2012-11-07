@@ -85,10 +85,11 @@ class TranslationController {
 		
 		$sql = "INSERT INTO translations (`" . implode('`, `', $cols) . "`) VALUES (:" . implode(', :', $cols) . ")";
 		$stmt = $this->_pdo->prepare($sql);
-		
+	
 		while ( ($line = fgetcsv($fp, 0, ';', '"')) !== FALSE ) {
 			$fields = array();
 			foreach ( $line as $id => $val ) {
+				if ( $id >= count($cols) ) break;
 				$stmt->bindValue($cols[$id], $val);
 			} // foreach
 			$stmt->execute();
