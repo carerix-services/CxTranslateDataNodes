@@ -34,6 +34,11 @@ class Translate {
 	 * Boolean holding whether to overwrite already existing values or not
 	 */
 	protected $_overwrite = false;
+	
+	/**
+	 * Holds the completed steps. If empty, start at question 1
+	 */
+	protected $_step = array();
 
 	/**
 	 * The number of datanodes to be handled
@@ -59,7 +64,11 @@ class Translate {
 			
 			$prop = '_' . $key;
 			if ( property_exists($this, $prop) ) {
-				$this->$prop = $val;
+				if ( $prop === '_steps' && !empty($this->$prop) ) {
+					$this->$prop = array_merge($this->$prop, $val);
+				} else {
+					$this->$prop = $val;
+				}
 			}
 		} // foreach
 		
@@ -72,7 +81,7 @@ class Translate {
 	 * Magic sleep function
 	 */
 	public function __sleep() {
-		return array('_app', '_password', '_sourcelanguage', '_filllanguages', '_overwrite', '_availablelanguages');
+		return array('_app', '_password', '_sourcelanguage', '_filllanguages', '_overwrite', '_availablelanguages', '_steps');
 	} // __sleep();
 	
 	/**
@@ -80,21 +89,40 @@ class Translate {
 	 */
 	public function run() {
 		$this->_tc = new TranslationController();
-		
+
 		if ( !$this->_tc->init() ) {
 			$this->showTranslationUpload();
-		} else if ( empty($this->_app) || empty($this->_password) ) {
+		} else if ( empty($this->_steps) || empty($this->_app) || empty($this->_password) || !in_array(1, $this->_steps) ) {
+			$this->_steps = array();
+			$this->_password = '';
 			$this->_showAppForm();
-		} else if ( empty($this->_sourcelanguage) || empty($this->_filllanguages) ) {
+		} else if ( empty($this->_sourcelanguage) || empty($this->_filllanguages)|| !in_array(2, $this->_steps) ) {
+			$this->_steps = array(1);
 			$this->_showLanguageForm();
 		} else {
 			$result = $this->_translate();
 			$this->_showResult();
 			
 			// reset the $_SESSION to reset the form
-			$_SESSION = array();
+			$this->resetForm();
 		}
 	} // run();
+	
+	/**
+	 * Resets the form. By default, it only resets the steps and the XML password.
+	 * When passing $partially as false, it resets all form fields
+	 * 
+	 * @param	boolean	[$partially]	Whether to reset partially (only password and
+	 * 															steps) or completely (entire session)
+	 */
+	public function resetForm($partially = true) {
+		if ( $partially ) {
+			$this->_password = '';
+			$this->_steps = array();
+		} else {
+			$_SESSION[__CLASS__] = null;
+		}
+	} // resetForm();
 	
 	/**
 	 * Shows the uploads view.
@@ -232,7 +260,7 @@ class Translate {
 					}
 					
 					$this->_updateNode($id, $datanodeid, $translation->$toLang, $overwriteID);
-					$this->_report($id, null, $original->nodeValue, $toLang);
+					$this->_report($id, null, $original->nodeValue, $toLang, $translation->$toLang);
 				} catch ( Exception $e ) {
 					$this->_report($id, $e->getMessage(), $original->nodeValue, $toLang);
 				}
@@ -255,19 +283,31 @@ class Translate {
 	 */
 	protected function _updateNode($id, $datanodeid, $value, $overwriteID = null) {
 		$doc = new DOMDocument;
-		$doc->loadXML("<?xml version='1.0' encoding='utf-8'?>
-				<CRDataNode id='{$id}'>
-					<values>
-						<CRDataNodeValue" . ($overwriteID !== null ? " id='{$overwriteID}'" : "") . ">
-							<toLanguageNode><CRDataNode id='{$datanodeid}'/></toLanguageNode>
-							<value>{$value}</value>
-						</CRDataNodeValue>
-					</values>
-				</CRDataNode>");
+		$doc->loadXML("<?xml version='1.0' encoding='UTF-8'?><CRDataNode id='{$id}'/>");
+		$doc->documentElement
+					->appendChild($doc->createElement('values'))
+						->appendChild($dataNode = $doc->createElement('CRDataNodeValue'))
+							->appendChild($doc->createElement('toLanguageNode'))
+								->appendChild($doc->createElement('CRDataNode'))
+									->setAttribute('id', $datanodeid)
+									->parentNode
+								->parentNode
+							->parentNode
+							->appendChild($valueNode = $doc->createElement('value'))
+		;
+
+		$valueNode->nodeValue = $this->_makeValueXMLSafe($value);
+		
+		if ( $overwriteID !== null ) {
+			$dataNode->setAttribute('id', $overwriteID);
+		}
 		
 		// retrieve the requested XML
 		$query = $doc->saveXML();
-
+		
+// 		echo "<pre>" . htmlentities($query) . "</pre>";
+// 		echo "<pre>" . mb_detect_encoding($query) . "</pre>";
+		
 		// create the POST context 
 		$context = array(
 				'http' => array(
@@ -291,12 +331,27 @@ class Translate {
 	} // _updateNode();
 	
 	/**
+	 * Makes an XML string "XML Safe" by replacing all non-ASCII characters by 
+	 * their xml code.
+	 *     
+	 * @param unknown $value
+	 */
+	protected function _makeValueXMLSafe($value) {
+		$chars = str_split($value);
+		$ret = '';
+		foreach ( $chars as $char ) {
+			$ret .= ord($char) > 127 ? ('&#x' . dechex(ord($char)) . ';') : $char; 
+		} // foreach
+		return $ret;
+	} // _makeValueXMLSafe
+	
+	/**
 	 * Report the success (if $message is null) or failure of a translation of $id
 	 * 
 	 * @param int $id
 	 * @param string $message
 	 */
-	protected function _report($id, $message = null, $original = null, $language = null) {
+	protected function _report($id, $message = null, $original = null, $language = null, $translation = null) {
 		$report = new DbReport;
 		$report->app = $this->_app;
 		$report->datanodeid = $id;
@@ -304,6 +359,7 @@ class Translate {
 		$report->message = $message;
 		$report->language = $language;
 		$report->original = $original;
+		$report->translation = $translation;
 		$report->store();
 	} // _report();
 	
@@ -368,5 +424,18 @@ class Translate {
 		
 		return $xpath;
 	} // _getAllDataNodes();
+	
+	/**
+	 * Returns the variables as per in the session
+	 * 
+	 * @return Translate
+	 */
+	public static function getSession() {
+		$cls = __CLASS__;
+		if ( empty($_SESSION[$cls]) ) {
+			$_SESSION[$cls] = new $cls;
+		}
+		return $_SESSION[$cls];
+	} // getSession();
 
 } // Translate

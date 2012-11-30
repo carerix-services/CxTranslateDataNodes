@@ -5,17 +5,14 @@
 	
 	session_start();
 	
-	if ( empty($_SESSION['theClass']) ) {
-		$_SESSION['theClass'] = new Translate;
-	}
-	
+	$sess = Translate::getSession();
 	switch ( strtoupper(empty($_REQUEST['verb']) ? 'run' : $_REQUEST['verb']) ) {
 		case 'UPLOAD' :
-			$_SESSION['theClass']->showTranslationUpload();
+			$sess->showTranslationUpload();
 			break;
 		default :
 		case 'RUN' :
-			$_SESSION['theClass']->run();
+			$sess->run();
 			break;
 	} // switch
 	

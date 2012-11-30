@@ -70,23 +70,30 @@ class TranslationController {
 		if ( !empty($file->error) || ($fp = fopen($file->tmp_name, 'r')) === FALSE ) {
 			throw new Exception('Something went wrong with the upload, please try again');
 		}
-
+		
 		// remove any "old" translations
 		$this->removeTranslations();
 		touch($this->_dbLocation);
 		$this->_getPDO();
 		
-		if ( !($cols = fgetcsv($fp, 0, ';', '"')) ) {
+		if ( !($cols = @fgets($fp)) ) {
 			throw new Exception('No valid columns found in file');
+		} else {
+			$cols = str_getcsv(trim($cols), ';', '"');
 		}
 		
-		$sql = "CREATE TABLE translations (`" . implode('`, `', $cols) . "`);";
+		$pre = "`";
+		$post = "` COLLATE NOCASE";
+		$sql = "CREATE TABLE translations ({$pre}" . implode("{$post}, {$pre}", $cols) . "{$post});";
 		$this->_pdo->exec($sql);
 		
 		$sql = "INSERT INTO translations (`" . implode('`, `', $cols) . "`) VALUES (:" . implode(', :', $cols) . ")";
 		$stmt = $this->_pdo->prepare($sql);
 	
-		while ( ($line = fgetcsv($fp, 0, ';', '"')) !== FALSE ) {
+		while ( ($line = fgets($fp)) !== FALSE ) {
+			set_time_limit(1);
+			$line = str_getcsv(rtrim($line), ';', '"');
+			
 			$fields = array();
 			foreach ( $line as $id => $val ) {
 				if ( $id >= count($cols) ) break;
@@ -94,7 +101,7 @@ class TranslationController {
 			} // foreach
 			$stmt->execute();
 		} // while
-
+		
 	} // createNewTranslations();
 
 	/**
@@ -146,3 +153,54 @@ class TranslationController {
 	} // removeTranslations();
 	
 } // TranslationController
+
+/**
+ * Is use the str_getcsv function, which has to be faked for ancient versions of
+ * PHP (below 5.3)
+ */
+if (!function_exists('str_getcsv')) {
+	function str_getcsv($input, $delimiter = ',', $enclosure = '"', $escape = '\\') {
+		if ( is_string($input) && !empty($input) ) {
+			if ( strpos($input, $enclosure) === FALSE ) {
+				// no enclosure: keep it simple!
+				$output = explode($delimiter, $input);
+			} else {
+				$output = array();
+				while ( strlen($input) ) {
+					if ( strpos($input, $enclosure) === 0 ) {
+						// get characters until enclosure ends, followed by delimiter
+						if ( ($lastPos = strpos($input, $enclosure . $delimiter, strlen($enclosure))) !== FALSE ) {
+							$part = substr($input, strlen($enclosure), $lastPos - strlen($enclosure));
+							$output[] = $part;
+							$input = substr($input, strlen($lastPos));
+						} else if ( ($lastPos = strpos($input, $enclosure, strlen($enclosure))) !== FALSE
+								&& $lastPos === (strlen($input) - strlen($enclosure))
+						) { // enclosed until end of line
+							$output[] = substr($input, strlen($enclosure), $lastPos - strlen($enclosure));
+							$input = '';
+						} else { // no enclosure: get it by default!
+							if ( ($lastPos = strpos($input, $delimiter)) !== FALSE ) {
+								$part = substr($input, 0, $lastPos);
+								$output[] = $part;
+								$input = substr($input, $lastPos + strlen($delimiter));
+							} else {
+								$output[] = $input;
+								$input = '';
+							}
+						}
+					} else if ( ($lastPos = strpos($input, $delimiter)) !== FALSE ) {
+						$part = substr($input, 0, $lastPos);
+						$output[] = $part;
+						$input = substr($input, $lastPos + strlen($delimiter));
+					} else {
+						$output[] = $input;
+						$input = '';
+					}
+				} // while
+			}
+		} else {
+			$output = false;
+		}
+		return $output;
+	} // str_getcsv();
+}

@@ -9,7 +9,7 @@ class ExceptionController {
 		require_once ROOTDIR . '/views/exceptions.phtml';
 		ViewController::setView(ob_get_clean());
 		require_once ROOTDIR . '/views/overview.phtml';
-		$_SESSION = array();
+		Translate::getSession()->resetForm();
 	} // addException();
 	
 } // ExceptionController();
