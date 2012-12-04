@@ -19,6 +19,13 @@ class TranslationController {
 	protected $_preparedGetFor = array();
 	
 	/**
+	 * The field separator for CSV to be used.
+	 *  
+	 * @var string
+	 */
+	public $_csvSeparator = ';';
+	
+	/**
 	 * Create the TranslationController
 	 */
 	public function __construct() {
@@ -71,6 +78,10 @@ class TranslationController {
 			throw new Exception('Something went wrong with the upload, please try again');
 		}
 		
+		if ( !empty($_REQUEST['separator']) ) {
+			$this->_csvSeparator = $_REQUEST['separator'];
+		}
+		
 		// remove any "old" translations
 		$this->removeTranslations();
 		touch($this->_dbLocation);
@@ -79,7 +90,7 @@ class TranslationController {
 		if ( !($cols = @fgets($fp)) ) {
 			throw new Exception('No valid columns found in file');
 		} else {
-			$cols = str_getcsv(trim($cols), ';', '"');
+			$cols = str_getcsv(trim($cols), $this->_csvSeparator, '"');
 		}
 		
 		$pre = "`";
@@ -89,10 +100,10 @@ class TranslationController {
 		
 		$sql = "INSERT INTO translations (`" . implode('`, `', $cols) . "`) VALUES (:" . implode(', :', $cols) . ")";
 		$stmt = $this->_pdo->prepare($sql);
-	
+
 		while ( ($line = fgets($fp)) !== FALSE ) {
 			set_time_limit(1);
-			$line = str_getcsv(rtrim($line), ';', '"');
+			$line = str_getcsv(rtrim($line), $this->_csvSeparator, '"');
 			
 			$fields = array();
 			foreach ( $line as $id => $val ) {

@@ -1,9 +1,32 @@
 <div class="span4 offset4">
-<form enctype="multipart/form-data" action="." method="POST">
+<form enctype="multipart/form-data" action="." method="POST" class="form-horizontal">
 	<legend>Choose a translation file</legend>
-	<input name="u<?= $_SESSION['secure']; ?>" type="file" /><br />
-	<br />
- 	<a href="." class="btn">Back</a>
- 	<input class="btn btn-danger" type="submit" value="Upload" />
+	<div class="control-group">
+		<label class="control-label" for="file">File</label>
+		<div class="controls">
+			<input name="u<?= $_SESSION['secure']; ?>" type="file" id="file"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="alert alert-info controls" style="margin-bottom: 0px">
+			This file <b>must</b> be in <span style="white-space: nowrap">UTF-8</span> encoding
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="separator">Separator</label>
+		<div class="controls">
+			<select name="separator" id="separator">
+				<option value=",">Comma separated (,)</option>
+				<option value=";">Semicolon separated (;)</option>
+				<option value="	">Tab separated (\t)</option>
+			</select>
+		</div>
+	</div>	
+	<div class="control-group">
+		<div class="controls">
+ 			<a href="." class="btn">Back</a>
+ 			<input class="btn btn-danger" type="submit" value="Upload" />
+ 		</div>
+ 	</div>
 </form> 
 </div>

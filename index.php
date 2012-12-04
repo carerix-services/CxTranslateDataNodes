@@ -10,6 +10,10 @@
 		case 'UPLOAD' :
 			$sess->showTranslationUpload();
 			break;
+		case 'RESET' :
+			$sess->resetForm();
+			header('Location: /CxTranslateDataNodes/');
+			exit;
 		default :
 		case 'RUN' :
 			$sess->run();

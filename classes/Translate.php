@@ -337,7 +337,12 @@ class Translate {
 	 * @param unknown $value
 	 */
 	protected function _makeValueXMLSafe($value) {
-		$chars = str_split($value);
+		return $value;
+		
+		// below works when encoding is not UTF-8 (probably only when encoding is 
+		// Latin or ANSII). Above works when encoding it UTF-8, which is required,
+		// so that version is used.
+		$chars = str_split(mb_convert_encoding($value, 'UTF-8'));
 		$ret = '';
 		foreach ( $chars as $char ) {
 			$ret .= ord($char) > 127 ? ('&#x' . dechex(ord($char)) . ';') : $char; 
